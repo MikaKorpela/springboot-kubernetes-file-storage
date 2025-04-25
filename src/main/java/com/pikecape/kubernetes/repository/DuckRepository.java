@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,11 +49,10 @@ public class DuckRepository {
     }
   }
 
-  public DuckEntity findByUid(UUID uid) {
+  public Optional<DuckEntity> findById(UUID uid) {
     return duckEntities.stream()
         .filter(p -> Objects.equals(p.getId(), uid))
-        .findFirst()
-        .orElse(null);
+        .findFirst();
   }
 
   public List<DuckEntity> findAll() {
@@ -91,10 +91,10 @@ public class DuckRepository {
     }
   }
 
-  public void deleteByUid(UUID uid) {
+  public void delete(DuckEntity duckEntity) {
     try {
       duckEntities = duckEntities.stream()
-          .filter(p -> !Objects.equals(p.getId(), uid))
+          .filter(p -> !Objects.equals(p.getId(), duckEntity.getId()))
           .collect(Collectors.toList());
 
       savePersonsToJsonFile();

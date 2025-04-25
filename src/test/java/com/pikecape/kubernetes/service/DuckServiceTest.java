@@ -9,6 +9,7 @@ import com.pikecape.kubernetes.model.Duck;
 import com.pikecape.kubernetes.repository.DuckRepository;
 import com.pikecape.kubernetes.repository.entity.DuckEntity;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +49,8 @@ class DuckServiceTest {
 
   @Test
   void testFindByUid() {
-    when(duckRepository.findByUid(id1)).thenReturn(donald);
+    when(duckRepository.findById(id1))
+        .thenReturn(Optional.of(donald));
 
     Duck result = duckService.findByUid(id1);
 
@@ -87,8 +89,8 @@ class DuckServiceTest {
   void testUpdateDuck() {
     Duck duck = DuckMapper.toDto(donald);
 
-    when(duckRepository.findByUid(id1))
-        .thenReturn(donald);
+    when(duckRepository.findById(id1))
+        .thenReturn(Optional.of(donald));
 
     when(duckRepository.update(any()))
         .then(invocation -> invocation.getArguments()[0]);
@@ -101,8 +103,8 @@ class DuckServiceTest {
 
   @Test
   void testDeletePerson() {
-    when(duckRepository.findByUid(id1))
-        .thenReturn(donald);
+    when(duckRepository.findById(id1))
+        .thenReturn(Optional.of(donald));
 
     duckService.deleteByUid(id1);
   }

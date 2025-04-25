@@ -2,9 +2,11 @@ package com.pikecape.kubernetes.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pikecape.kubernetes.repository.entity.DuckEntity;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,13 +42,14 @@ public class DuckRepositoryTest {
       .build();
 
   @Test
-  void testFindByUid() {
+  void testFindById() {
     DuckEntity created = personJsonRepository.create(donald);
     UUID id = created.getId();
 
-    DuckEntity result = personJsonRepository.findByUid(id);
+    Optional<DuckEntity> result = personJsonRepository.findById(id);
 
-    assertEquals(donald.getName(), result.getName());
+    assertTrue(result.isPresent());
+    assertEquals(donald.getName(), result.get().getName());
   }
 
   @Test
@@ -99,7 +102,7 @@ public class DuckRepositoryTest {
 
     assertEquals(1, result.size());
 
-    personJsonRepository.deleteByUid(id);
+    personJsonRepository.delete(created);
 
     result = personJsonRepository.findAll();
 
@@ -108,7 +111,7 @@ public class DuckRepositoryTest {
 
   private void cleanup() {
     personJsonRepository.findAll().forEach(duck ->
-        personJsonRepository.deleteByUid(duck.getId())
+        personJsonRepository.delete(duck)
     );
   }
 }

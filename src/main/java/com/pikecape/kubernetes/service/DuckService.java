@@ -3,6 +3,7 @@ package com.pikecape.kubernetes.service;
 import com.pikecape.kubernetes.mapper.DuckMapper;
 import com.pikecape.kubernetes.model.Duck;
 import com.pikecape.kubernetes.repository.DuckRepository;
+import com.pikecape.kubernetes.repository.entity.DuckEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class DuckService {
   private static final String DUCK_NOT_FOUND = "Duck not found";
 
   public Duck findByUid(UUID id) {
-    return Optional.ofNullable(duckRepository.findByUid(id))
+    return duckRepository.findById(id)
         .map(DuckMapper::toDto)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DUCK_NOT_FOUND));
   }
@@ -35,7 +36,7 @@ public class DuckService {
   }
 
   public Duck update(UUID id, Duck duck) {
-    Optional.ofNullable(duckRepository.findByUid(id))
+    Optional.ofNullable(duckRepository.findById(id))
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DUCK_NOT_FOUND));
 
     duck = duck.toBuilder()
@@ -46,9 +47,7 @@ public class DuckService {
   }
 
   public void deleteByUid(UUID id) {
-    Optional.ofNullable(duckRepository.findByUid(id))
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DUCK_NOT_FOUND));
-
-    duckRepository.deleteByUid(id);
+    duckRepository.delete(duckRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, DUCK_NOT_FOUND)));
   }
 }
