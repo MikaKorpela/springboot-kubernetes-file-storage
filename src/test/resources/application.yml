@@ -1,0 +1,7 @@
+pikecape:
+  duck:
+    json-file-path: src/test/resources/ducks.json
+
+spring:
+  application:
+    name: springboot-kubernetes-file-storage

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  ducks-deployment
+  labels:
+    name:  ducks-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      server: ducks
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        server: ducks
+    spec:
+      containers:
+        - name: ducks-server
+          image: ducks:1
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "500M"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: ducks-json
+              mountPath: /src/main/resources
+      volumes:
+        - name: ducks-json
+          configMap:
+            name: ducks-empty-json
+            items:
+              - key: ducks.json
+                path: ducks.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ducks-service
+spec:
+  selector:
+    server: ducks
+  type: ClusterIP
+  ports:
+    - port: 8180
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ducks-ingress
+  labels:
+    name: ducks-ingress
+spec:
+  rules:
+    - host: ducks.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: ducks-service
+                port:
+                  number: 8180
