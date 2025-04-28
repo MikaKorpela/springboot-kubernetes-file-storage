@@ -6,11 +6,11 @@ The Spring Boot application stores entities to JSON file.
 
 ## Application Structure ##
 
-The Spring Boot application implements a singel API that can be used for CRUD operations on the `Duck` entities.
+The Spring Boot application implements a single API that can be used for CRUD operations on the `Duck` entities.
 
 The Spring Boot application has layered implementation that consist of controller, service and repository classes.
 
-THe repository class needs a JSON file (`src/main/resources/ducks.json`) to store the `Duck` entities.
+The repository class needs a JSON file (`src/main/resources/ducks.json`) to store the `Duck` entities.
 
 ## Dockerfile ##
 
@@ -27,13 +27,11 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 
 The Kubernetes configuration requires deployment, service and ingress configurations.
 
-The `/src/main/resource/ducks.json` file does not require an actual volume, but it is mounted to the pod using a configmap.
+The `/src/main/resource/ducks.json` file does not require an actual volume, but it is mounted to the pod using a `configmap`.
 
-The configurations are included into a single file ducks.yaml, which is deployed with following command:
+The configurations are included into a single file `ducks-json-application.yaml`, which is deployed with following command:
 
-`kubectl create -f ducks.yaml`
-
-```yaml
+`kubectl create -f ducks-json-application.yaml`
 
 ### Deployment ###
 
@@ -47,20 +45,20 @@ The configmap is crated to Kubernetes with following command:
 
 `kubectl create configmap ducks-empty-json --from-file=ducks.json`
 
-The deployment configuration contains a container definition (`ducks-server`) and a reference to the configmap (`ducks-empty-json`) as a volume.
+The deployment configuration contains a container definition (`ducks-json-server`) and a reference to the `configmap` (`ducks-empty-json`) as a volume.
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  ducks-deployment
+  name:  ducks-json-deployment
   labels:
-    name:  ducks-deployment
+    name:  ducks-json-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      server: ducks
+      server: ducks-json
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -69,11 +67,11 @@ spec:
   template:
     metadata:
       labels:
-        server: ducks
+        server: ducks-json
     spec:
       containers:
-      - name: ducks-server
-        image: ducks:1
+      - name: ducks-json-server
+        image: ducks-json:latest
         imagePullPolicy: Never
         resources:
           limits:
@@ -95,16 +93,16 @@ spec:
 
 ### Service ###
 
-The service configuration has a reference to container (`ducks` → `ducks-server`) and it exposes port 8080 to outside world.
+The service configuration has a reference to container (`ducks-json` → `ducks-json-server`) and it exposes port 8180 to outside world.
 
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: ducks-service
+  name: ducks-json-service
 spec:
   selector:
-    server: ducks
+    server: ducks-json
   type: ClusterIP
   ports:
   - port: 8180
@@ -113,18 +111,18 @@ spec:
 
 ### Ingress ###
 
-The ingress configuration has a reference to the service (`ducks-service`) and it exposes port 8180 to outside world.
+The ingress configuration has a reference to the service (`ducks-json-service`) and it exposes port 8180 to outside world.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ducks-ingress
+  name: ducks-json-ingress
   labels:
-    name: ducks-ingress
+    name: ducks-json-ingress
 spec:
   rules:
-  - host: ducks.local
+  - host: ducks-json.local
     http:
       paths:
       - pathType: Prefix
