@@ -23,6 +23,12 @@ COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
 ```
 
+### Image Creation with Minikube ###
+
+If the used Kubernetes instance is minikube and it is running in Windows, then the Docker image must be created directly to the image repository in minikube, because the image repositories used by the local Docker daemon and minikube are not the same.
+
+`minikube image build -t ducks-psql:<version> .`
+
 ## Kubernetes Configurations ##
 
 The Kubernetes configuration requires deployment, service and ingress configurations.
