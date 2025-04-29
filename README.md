@@ -27,7 +27,7 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 
 If the used Kubernetes instance is minikube and it is running in Windows, then the Docker image must be created directly to the image repository in minikube, because the image repositories used by the local Docker daemon and minikube are not the same.
 
-`minikube image build -t ducks-psql:<version> .`
+`minikube image build -t ducks-json:<version> .`
 
 ## Kubernetes Configurations ##
 
@@ -135,7 +135,7 @@ spec:
         path: "/"
         backend:
           service:
-            name: ducks-service
+            name: ducks-json-service
             port:
               number: 8180
 ```
